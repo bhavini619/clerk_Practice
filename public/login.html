@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Success</title>
+    <!-- Load Clerk JS SDK -->
+    <script
+      async
+      crossorigin="anonymous"
+      data-clerk-publishable-key="pk_test_c3VyZS1ibHVlamF5LTQzLmNsZXJrLmFjY291bnRzLmRldiQ"
+      src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    ></script>
+  </head>
+  <body>
+    <h2>Login Successful!</h2>
+    <button onclick="getSessionToken()">Call Protected API</button>
+
+    <script>
+
+  async function getSessionToken() {
+    await window.Clerk.load();
+
+    const session = window.Clerk.session;
+
+    if (!session) {
+      alert("No session found");
+      return;
+    }
+
+    const token = await session.getToken(); // Gets JWT token
+
+    console.log("Clerk Token:", token);
+
+    const res = await fetch("/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const text = await res.text();
+    alert("API Response: " + text);
+  }
+
+
+    </script>
+  </body>
+</html>

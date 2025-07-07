@@ -6,7 +6,7 @@
     <script
       async
       crossorigin="anonymous"
-      data-clerk-publishable-key="pk_test_c3VyZS1ibHVlamF5LTQzLmNsZXJrLmFjY291bnRzLmRldiQ"
+      data-clerk-publishable-key="pk_test_cmVhZHktamFja2FsLTgzLmNsZXJrLmFjY291bnRzLmRldiQ"
       src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
     ></script>
   </head>
@@ -20,13 +20,28 @@
     await window.Clerk.load();
 
     const session = window.Clerk.session;
-
-    if (!session) {
+     const user = window.Clerk.user;
+    if (!session || !user) {
       alert("No session found");
       return;
     }
+    const orgMemberships = await user.getOrganizationMemberships();
+  
 
-    const token = await session.getToken(); // Gets JWT token
+
+        if (orgMemberships.length === 0) {
+          alert("User is not part of any organization");
+          return;
+        }
+
+        // Set the first organization as active
+        
+        const firstOrgId = orgMemberships.data[0].organization.id
+        console.log("First Organization ID:", firstOrgId);
+        await window.Clerk.setActive({ organization: firstOrgId });
+
+
+   const token = await session.getToken(); // Gets JWT token
 
     console.log("Clerk Token:", token);
 
@@ -36,8 +51,6 @@
       }
     });
 
-    const text = await res.text();
-    alert("API Response: " + text);
   }
 
 
